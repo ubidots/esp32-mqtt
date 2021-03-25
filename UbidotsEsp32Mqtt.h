@@ -32,14 +32,19 @@ class Ubidots {
   // void (*callback)(char*, uint8_t*, unsigned int);
   WiFiClient _client_tcp_ubi;
   PubSubClient _client_mqtt_ubi = PubSubClient(_client_tcp_ubi);
-  char _clientName[50];
+  char* _broker;
+  ContextUbi* _context;
+  char* _clientName;
+  int _brokerPort;
   bool _debug = false;
+  int8_t _current_context = 0;
   uint8_t _currentValue;
   char* _ssidPassword;
   char* _ssid;
-  char _token[50];
-  void _initInstance(const char* token, const char* clientName, const char* broker, const int brokerPort);
+  char* _token;
   Value* _dotValue;
+  void _floatToChar(char* strValue, float value);
+  void _builder(const char* token, const char* clientName, const char* broker, const int brokerPort);
 
  public:
   Ubidots(const char* token);
@@ -47,22 +52,27 @@ class Ubidots {
   Ubidots(const char* token, const char* broker, const int brokerPort);
   Ubidots(const char* token, const char* clientName, const char* broker);
   Ubidots(const char* token, const char* clientName, const char* broker, const int brokerPort);
-  // void add(const char* variableLabel, float value);
-  // void add(const char* variableLabel, float value, const char* context);
-  // void add(const char* variableLabel, float value, const char* context, unsigned long dot_timestamp_seconds);
-  // void add(const char* variableLabel, float value, const char* context, unsigned long dot_timestamp_seconds,
-  //          unsigned int dot_timestamp_millis);
+  ~Ubidots();
+  void add(const char* variableLabel, float value);
+  void add(const char* variableLabel, float value, char* context);
+  void add(const char* variableLabel, float value, char* context, unsigned long dot_timestamp_seconds);
+  void add(const char* variableLabel, float value, char* context, unsigned long dot_timestamp_seconds,
+           unsigned int dot_timestamp_millis);
+  void addContext(char* key_label, char* key_value);
   bool connected();
   bool connect();
   bool connect(const char* username, const char* password);
   bool connect(const char* clientName, const char* username, const char* password);
   void connectToWifi(const char* ssid, const char* pass);
   void disconnect();
+  void getContext(char* context_result);
   bool loop();
+  bool publish();
   bool publish(const char* deviceLabel);
   void reconnect();
   void setDebug(bool debug);
   void setCallback(void (*callback)(char*, uint8_t*, unsigned int));
+  void setup();
   bool subscribe(const char* topic);
   bool subscribeLastValue(const char* deviceLabel, const char* variableLabel);
 };

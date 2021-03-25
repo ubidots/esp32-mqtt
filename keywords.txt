@@ -1,0 +1,34 @@
+#######################################
+# Syntax Coloring Map For ExampleLibrary
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+add	KEYWORD2
+addContext	KEYWORD2
+disconnect	KEYWORD2
+getContext	KEYWORD2
+begin	KEYWORD2
+connected	KEYWORD2
+loop	KEYWORD2
+ubidotsPublish	KEYWORD2
+ubidotsSubscribe	KEYWORD2
+ubidotsSetBroker	KEYWORD2
+reconnect	KEYWORD2
+setDebug	KEYWORD2
+connectToWifi	KEYWORD2
+setCallback	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################

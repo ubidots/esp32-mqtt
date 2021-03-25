@@ -23,10 +23,15 @@ Created by: Jose Garcia @jotathebest at github: https://github.com/jotathebest
 #define _UbiTypes_H_
 
 typedef struct Value {
-  const char* _variableLabel;
-  float _value;
-  const char* _context;
-  const char* dotTimestamp;
+  const char *variableLabel;
+  char *dotContext;
+  float dotValue;
+  char dotTimestamp[14];
 } Value;
+
+typedef struct ContextUbi {
+  char *key_label;
+  char *key_value;
+} ContextUbi;
 
 #endif
