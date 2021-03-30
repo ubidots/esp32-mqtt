@@ -48,14 +48,14 @@ void setup() {
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
-  ubidots.subscribeLastValue("esp8266", "temperature");  // Insert the dataSource and Variable's Labels
+  ubidots.subscribeLastValue("esp32", "temperature");  // Insert the dataSource and Variable's Labels
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if (!ubidots.connected()) {
     ubidots.reconnect();
-    ubidots.subscribeLastValue("esp8266", "temperature");  // Insert the dataSource and Variable's Labels
+    ubidots.subscribeLastValue("esp32", "temperature");  // Insert the dataSource and Variable's Labels
   }
   ubidots.loop();
   delay(5000);

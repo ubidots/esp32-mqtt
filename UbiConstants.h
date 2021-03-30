@@ -27,7 +27,7 @@ Jose Garcia @jotathebest at github: https://github.com/jotathebest
 #include "stdint.h"
 
 const char UBIDOTS_BROKER[] = "industrial.api.ubidots.com";
-const char *const USER_AGENT = "UbidotsESP8266/3.0.1";
+const char *const USER_AGENT = "UbidotsESP32/1.0";
 const uint8_t MAX_VALUES = 10;
 const int UBIDOTS_MQTT_PORT = 1883;
 const int MAX_BUFFER_SIZE = 512;
