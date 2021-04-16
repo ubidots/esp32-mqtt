@@ -16,22 +16,28 @@
 /****************************************
  * Define Constants
  ****************************************/
-const char* UBIDOTS_TOKEN = "";  // Put here your Ubidots TOKEN
-const char* WIFI_SSID = "";      // Put here your Wi-Fi SSID
-const char* WIFI_PASS = "";      // Put here your Wi-Fi password
+const char* UBIDOTS_TOKEN = "";                               // Put here your Ubidots TOKEN
+const char* WIFI_SSID = "";                                   // Put here your Wi-Fi SSID
+const char* WIFI_PASS = "";                                   // Put here your Wi-Fi password
+const char* DEVICE_LABEL_TO_RETRIEVE_VALUES_FROM = "demo";    // Replace with your device label
+const char* VARIABLE_LABEL_TO_RETRIEVE_VALUES_FROM = "demo";  // Replace with your variable label
 
 Ubidots ubidots(UBIDOTS_TOKEN);
 
 /****************************************
  * Auxiliar Functions
  ****************************************/
-
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
+  }
+  if ((char)payload[0] == '1') {
+    digitalWrite(16, HIGH);
+  } else {
+    digitalWrite(16, LOW);
   }
   Serial.println();
 }
@@ -48,21 +54,17 @@ void setup() {
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
+  ubidots.subscribeLastValue("esp32", "temperature");  // Insert the dataSource and Variable's Labels
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if (!ubidots.connected()) {
     ubidots.reconnect();
+    ubidots.subscribeLastValue("esp32", "temperature");  // Insert the dataSource and Variable's Labels
   }
-
-  // Publish values to 2 different data sources
-
-  ubidots.add("stuff", 10.2);  // Insert your variable Labels and the value to be sent
+  ubidots.add("stuff", 10);
   ubidots.publish("source1");
-  ubidots.add("stuff", 10.2);
-  ubidots.add("more-stuff", 120.2);
-  ubidots.publish("source2");
   ubidots.loop();
   delay(5000);
 }
