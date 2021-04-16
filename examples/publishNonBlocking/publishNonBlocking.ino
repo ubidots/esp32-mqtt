@@ -4,6 +4,8 @@
  * If you are using the old educational platform,
  * please consider to migrate your account to a STEM plan
  *
+ * Developed by Jose Garcia, https://github.com/jotathebest/
+ *
  * ****************************************/
 
 /****************************************
@@ -21,6 +23,11 @@ const char* WIFI_PASS = "";      // Put here your Wi-Fi password
 Ubidots ubidots(UBIDOTS_TOKEN);
 
 /****************************************
+ * Auxiliar variables
+ ****************************************/
+unsigned long timer;
+
+/****************************************
  * Auxiliar Functions
  ****************************************/
 
@@ -32,6 +39,25 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
+}
+
+void publishToUbidots() {
+  if (!ubidots.connected()) {
+    ubidots.connect();
+  }
+  if (ubidots.connected()) {
+    Serial.println("connected");
+    // Publish values to 2 different data sources
+
+    ubidots.add("stuff", 10.2);  // Insert your variable Labels and the value to be sent
+    ubidots.publish("source1");
+    ubidots.add("stuff", 10.2);
+    ubidots.add("more-stuff", 120.2);
+    ubidots.publish("source2");
+  } else {
+    Serial.println("could not connect");
+    ubidots.disconnect();
+  }
 }
 
 /****************************************
@@ -46,29 +72,16 @@ void setup() {
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
+  timer = millis();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
-  if (!ubidots.connected()) {
-    Serial.println("connecting");
-    ubidots.connect();
-    if (ubidots.connected()) {
-      Serial.println("connected");
-      // Publish values to 2 different data sources
-
-      ubidots.add("stuff", 10.2);  // Insert your variable Labels and the value to be sent
-      ubidots.ubidotsPublish("source1");
-      ubidots.add("stuff", 10.2);
-      ubidots.add("more-stuff", 120.2);
-      ubidots.ubidotsPublish("source2");
-    } else {
-      Serial.println("could not connect");
-      ubidots.disconnect();
-    }
+  if (abs(millis() - timer) > 5000) {  // triggers the routine every 5 seconds
+    publishToUbidots();
+    timer = millis();
   }
-
-  ubidots.loop();
-  delay(5000);
+  if (ubidots.connected()) {
+    ubidots.loop();
+  }
 }
