@@ -16,12 +16,13 @@
 /****************************************
  * Define Constants
  ****************************************/
-const char* UBIDOTS_TOKEN = "";                               // Put here your Ubidots TOKEN
-const char* WIFI_SSID = "";                                   // Put here your Wi-Fi SSID
-const char* WIFI_PASS = "";                                   // Put here your Wi-Fi password
-const char* DEVICE_LABEL_TO_RETRIEVE_VALUES_FROM = "demo";    // Replace with your device label
-const char* VARIABLE_LABEL_TO_RETRIEVE_VALUES_FROM = "demo";  // Replace with your variable label
-#define LED 5
+const char *UBIDOTS_TOKEN = "";  // Put here your Ubidots TOKEN
+const char *WIFI_SSID = "";      // Put here your Wi-Fi SSID
+const char *WIFI_PASS = "";      // Put here your Wi-Fi password
+const char *DEVICE_LABEL = "";   // Replace with the device label to subscribe to
+const char *VARIABLE_LABEL = ""; // Replace with your variable label to subscribe to
+
+const uint8_t LED = 5; // Pin used to write data based on 1's and 0's coming from Ubidots
 
 Ubidots ubidots(UBIDOTS_TOKEN);
 
@@ -29,15 +30,20 @@ Ubidots ubidots(UBIDOTS_TOKEN);
  * Auxiliar Functions
  ****************************************/
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     Serial.print((char)payload[i]);
-    if ((char)payload[0] == '1') {
+    if ((char)payload[0] == '1')
+    {
       digitalWrite(LED, HIGH);
-    } else {
+    }
+    else
+    {
       digitalWrite(LED, LOW);
     }
   }
@@ -48,26 +54,27 @@ void callback(char* topic, byte* payload, unsigned int length) {
  * Main Functions
  ****************************************/
 
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
   Serial.begin(115200);
-  ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
+  pinMode(LED, OUTPUT);
+
   // ubidots.setDebug(true);  // uncomment this to make debug messages available
+  ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
-  pinMode(LED, OUTPUT);
-  ubidots.subscribeLastValue(DEVICE_LABEL_TO_RETRIEVE_VALUES_FROM,
-                             VARIABLE_LABEL_TO_RETRIEVE_VALUES_FROM);  // Insert the dataSource and Variable's Labels
+  ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL); // Insert the device and variable's Labels, respectively
 }
 
-void loop() {
-  // put your main code here, to run r  epeatedly:
-  if (!ubidots.connected()) {
+void loop()
+{
+  // put your main code here, to run repeatedly:
+  if (!ubidots.connected())
+  {
     ubidots.reconnect();
-    ubidots.subscribeLastValue(DEVICE_LABEL_TO_RETRIEVE_VALUES_FROM,
-                               VARIABLE_LABEL_TO_RETRIEVE_VALUES_FROM);  // Insert the dataSource and Variable's Labels
+    ubidots.subscribeLastValue(DEVICE_LABEL, VARIABLE_LABEL); // Insert the device and variable's Labels, respectively
   }
   ubidots.loop();
-  delay(5000);
 }

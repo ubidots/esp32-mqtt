@@ -1,8 +1,6 @@
 /******************************************
  *
  * This example works for both Industrial and STEM users.
- * If you are using the old educational platform,
- * please consider to migrate your account to a STEM plan
  *
  * Developed by Jose Garcia, https://github.com/jotathebest/
  *
@@ -16,28 +14,32 @@
 /****************************************
  * Define Constants
  ****************************************/
-const char* UBIDOTS_TOKEN = "";                               // Put here your Ubidots TOKEN
-const char* WIFI_SSID = "";                                   // Put here your Wi-Fi SSID
-const char* WIFI_PASS = "";                                   // Put here your Wi-Fi password
-const char* DEVICE_LABEL_TO_RETRIEVE_VALUES_FROM = "demo";    // Replace with your device label
-const char* VARIABLE_LABEL_TO_RETRIEVE_VALUES_FROM = "demo";  // Replace with your variable label
+const char *UBIDOTS_TOKEN = "";            // Put here your Ubidots TOKEN
+const char *WIFI_SSID = "";                // Put here your Wi-Fi SSID
+const char *WIFI_PASS = "";                // Put here your Wi-Fi password
+const char *PUBLISH_DEVICE_LABEL = "";     // Put here your Device label to which data  will be published
+const char *PUBLISH_VARIABLE_LABEL = "";   // Put here your Variable label to which data  will be published
+const char *SUBSCRIBE_DEVICE_LABEL = "";   // Replace with the device label to subscribe to
+const char *SUBSCRIBE_VARIABLE_LABEL = ""; // Replace with the variable label to subscribe to
+
+const int PUBLISH_FREQUENCY = 5000; // Update rate in millisecondsx
+
+unsigned long timer;
+uint8_t analogPin = 34; // Pin used to read data from GPIO34 ADC_CH6.
 
 Ubidots ubidots(UBIDOTS_TOKEN);
 
 /****************************************
  * Auxiliar Functions
  ****************************************/
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++)
+  {
     Serial.print((char)payload[i]);
-  }
-  if ((char)payload[0] == '1') {
-    digitalWrite(16, HIGH);
-  } else {
-    digitalWrite(16, LOW);
   }
   Serial.println();
 }
@@ -46,25 +48,35 @@ void callback(char* topic, byte* payload, unsigned int length) {
  * Main Functions
  ****************************************/
 
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
   Serial.begin(115200);
-  ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
   // ubidots.setDebug(true);  // uncomment this to make debug messages available
+  ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
-  ubidots.subscribeLastValue("esp32", "temperature");  // Insert the dataSource and Variable's Labels
+  ubidots.subscribeLastValue(SUBSCRIBE_DEVICE_LABEL, SUBSCRIBE_VARIABLE_LABEL); // Insert the device and variable's Labels, respectively
+
+  timer = millis();
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
-  if (!ubidots.connected()) {
+  if (!ubidots.connected())
+  {
     ubidots.reconnect();
-    ubidots.subscribeLastValue("esp32", "temperature");  // Insert the dataSource and Variable's Labels
+    ubidots.subscribeLastValue(SUBSCRIBE_DEVICE_LABEL, SUBSCRIBE_VARIABLE_LABEL); // Insert the device and variable's Labels, respectively
   }
-  ubidots.add("stuff", 10);
-  ubidots.publish("source1");
+  if (abs(millis() - timer) > PUBLISH_FREQUENCY) // triggers the routine every 5 seconds
+  {
+    float value = analogRead(analogPin);
+    ubidots.add(PUBLISH_VARIABLE_LABEL, value); // Insert your variable Labels and the value to be sent
+    ubidots.publish(PUBLISH_DEVICE_LABEL);
+    timer = millis();
+  }
+
   ubidots.loop();
-  delay(5000);
 }
