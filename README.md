@@ -6,7 +6,7 @@ The ESP32 is a microcontroller developed by [Espressif Systems](http://espressif
 
 - [An ESP32 module](https://www.sparkfun.com/products/15663).
 - [Arduino IDE 1.6.5 or higher](https://www.arduino.cc/en/Main/Software)
-- [PubSubclient Library] (https://github.com/knolleary/pubsubclient)
+- [PubSubclient Library](https://github.com/knolleary/pubsubclient)
 - [Ubidots library](https://github.com/ubidots/esp32/archive/main.zip)
 
 ## Setup
@@ -27,6 +27,9 @@ The ESP32 is a microcontroller developed by [Espressif Systems](http://espressif
 8. Select the .ZIP file of Ubidots and then "**Accept**".
 9. Close the Arduino IDE and open it again.
 
+**NOTE:** This library supports sending data over sockets without TLS only. Your data will not be encrypted. We encourage, if you are deploying devices to a production environment, to create your own firmware routines to send data securely or to isolate the network where the ESP32 will be connected.
+We do not guarantee any issue, data miss or external sniff coming from the library usage or implementation.
+
 # Documentation
 
 ## Constructor
@@ -40,10 +43,6 @@ The ESP32 is a microcontroller developed by [Espressif Systems](http://espressif
 `Ubidots(const char* token, const char* clientName, const char* broker, const int brokerPort)`
 
 Creates an Ubidots instance.
-
-**NOTE:** This library supports to send data using TCP, not TCPs. Your data will not be encrypted. We encourage, if you are deploying devices to a production environment, to create your own firmware routines to send data securely or to isolate the network where the ESP32 will be connected.
-
-We do not guarantee any issue, data miss or external sniff coming from the library usage or implementation.
 
 - @token, [Required]. Your Ubidots unique account [TOKEN](http://help.ubidots.com/user-guides/find-your-token-from-your-ubidots-account).
 - @clientName, [Optional] [default] = device unique MAC address. The MQTT unique client id to be identified by the broker.
@@ -71,6 +70,12 @@ Adds to local memory a new key-value context key. The method inputs must be char
 - @key_label, [Required]. The key context label to store values.
 - @key_value, [Required]. The key pair value.
 
+`void getContext(char *context)`
+
+Builds the context according to the chosen protocol and stores it in the context char pointer.
+
+- @context, [Required]. A char pointer where the context will be stored.
+
 `bool connected()`
 
 Returns true if the ESP32 is connected to the broker
@@ -93,12 +98,6 @@ Connects to an available WiFi network using WAP2.
 `void disconnect()`
 
 Disconnects gracefully from the broker, closing the socket
-
-`void getContext(char *context)`
-
-Builds the context according to the chosen protocol and stores it in the context char pointer.
-
-- @context, [Required]. A char pointer where the context will be stored.
 
 `void loop()`
 
