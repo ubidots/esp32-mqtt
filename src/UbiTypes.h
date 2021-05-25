@@ -30,8 +30,8 @@ typedef struct Value {
 } Value;
 
 typedef struct ContextUbi {
-  char *key_label;
-  char *key_value;
+  char *keyLabel;
+  char *keyValue;
 } ContextUbi;
 
 #endif

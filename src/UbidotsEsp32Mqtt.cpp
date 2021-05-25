@@ -57,7 +57,7 @@ Ubidots::Ubidots(const char* token, const char* clientName, const char* broker, 
 
 Ubidots::~Ubidots() {
   free(_dotValue);
-  _client_mqtt_ubi.disconnect();
+  _clientMqttUbi.disconnect();
 }
 
 void Ubidots::_builder(const char* token, const char* clientName, const char* broker, const int brokerPort) {
@@ -76,7 +76,7 @@ void Ubidots::setup() {
   Serial.println(_brokerPort);
   Serial.println(_clientName);
   Serial.println(_token);
-  _client_mqtt_ubi.setServer(_broker, _brokerPort);
+  _clientMqttUbi.setServer(_broker, _brokerPort);
 }
 
 /***************************************************************************
@@ -87,7 +87,7 @@ FUNCTIONS TO SEND/RETRIEVE DATA
  * Retrieves data from Ubidots by subscribing to a custom topic
  * @arg topic [Mandatory] topic to be subscribed
  */
-bool Ubidots::subscribe(const char* topic) { return _client_mqtt_ubi.subscribe(topic); }
+bool Ubidots::subscribe(const char* topic) { return _clientMqttUbi.subscribe(topic); }
 
 /**
  * Retrieves data from Ubidots by subscribing to an lv topic
@@ -140,7 +140,7 @@ bool Ubidots::publish(const char* deviceLabel) {
     Serial.println(payload);
   }
   _currentValue = 0;
-  return _client_mqtt_ubi.publish(topic, payload, MAX_BUFFER_SIZE);
+  return _clientMqttUbi.publish(topic, payload, MAX_BUFFER_SIZE);
 }
 
 /***************************************************************************
@@ -150,7 +150,7 @@ FUNCTIONS TO MANAGE SOCKET CONNECTION
 /**
  * returns true if the ESP32 is connected to the broker
  */
-bool Ubidots::connected() { return _client_mqtt_ubi.connected(); };
+bool Ubidots::connected() { return _clientMqttUbi.connected(); };
 
 /**
  * Overloaded connect() methods.
@@ -162,12 +162,12 @@ bool Ubidots::connected() { return _client_mqtt_ubi.connected(); };
 bool Ubidots::connect() { return connect(_clientName, _token, _token); }
 bool Ubidots::connect(const char* username, const char* password) { return connect(_clientName, username, password); }
 bool Ubidots::connect(const char* clientName, const char* username, const char* password) {
-  bool result = _client_mqtt_ubi.connect(clientName, username, password);
+  bool result = _clientMqttUbi.connect(clientName, username, password);
   if (_debug) {
     Serial.println("attempting to connect");
     if (!result) {
       Serial.print("failed, rc=");
-      Serial.print(_client_mqtt_ubi.state());
+      Serial.print(_clientMqttUbi.state());
     }
   }
   return result;
@@ -176,26 +176,26 @@ bool Ubidots::connect(const char* clientName, const char* username, const char* 
 /**
  * Disconnects gracefully from the broker, closing the socket
  */
-void Ubidots::disconnect() { _client_mqtt_ubi.disconnect(); };
+void Ubidots::disconnect() { _clientMqttUbi.disconnect(); };
 
 /**
  * Maintains the socket connection and sends periodically the keep alive command
  */
-bool Ubidots::loop() { return _client_mqtt_ubi.loop(); };
+bool Ubidots::loop() { return _clientMqttUbi.loop(); };
 
 /**
  * Attempts to reconnect to the server using as password and username the Ubidots token
  * This is a blocking function
  */
 void Ubidots::reconnect() {
-  while (!_client_mqtt_ubi.connected()) {
+  while (!_clientMqttUbi.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (_client_mqtt_ubi.connect(_clientName, _token, _token)) {
+    if (_clientMqttUbi.connect(_clientName, _token, _token)) {
       Serial.println("connected");
       break;
     } else {
       Serial.print("failed, rc=");
-      Serial.print(_client_mqtt_ubi.state());
+      Serial.print(_clientMqttUbi.state());
       Serial.println(" try again in 3 seconds");
       delay(3000);
     }
@@ -211,10 +211,10 @@ AUXILIAR FUNCTIONS
  * @arg variable_label [Mandatory] variable label where the dot will be stored
  * @arg value [Mandatory] Dot value
  * @arg context [optional] Dot context to store. Default NULL
- * @arg dot_timestamp_seconds [optional] Dot timestamp in seconds, usefull for
+ * @arg dotTimestampSeconds [optional] Dot timestamp in seconds, usefull for
  * datalogger. Default NULL
- * @arg dot_timestamp_millis [optional] Dot timestamp in millis to add to
- * dot_timestamp_seconds, usefull for datalogger.
+ * @arg dotTimestampMillis [optional] Dot timestamp in millis to add to
+ * dotTimestampSeconds, usefull for datalogger.
  */
 
 void Ubidots::add(const char* variableLabel, float value) { add(variableLabel, value, "NULL", NULL, NULL); }
@@ -223,26 +223,26 @@ void Ubidots::add(const char* variableLabel, float value, char* context) {
   add(variableLabel, value, context, NULL, NULL);
 }
 
-void Ubidots::add(const char* variableLabel, float value, char* context, unsigned long dot_timestamp_seconds) {
-  add(variableLabel, value, context, dot_timestamp_seconds, NULL);
+void Ubidots::add(const char* variableLabel, float value, char* context, unsigned long dotTimestampSeconds) {
+  add(variableLabel, value, context, dotTimestampSeconds, NULL);
 }
 
-void Ubidots::add(const char* variableLabel, float value, char* context, unsigned long dot_timestamp_seconds,
-                  unsigned int dot_timestamp_millis) {
+void Ubidots::add(const char* variableLabel, float value, char* context, unsigned long dotTimestampSeconds,
+                  unsigned int dotTimestampMillis) {
   (_dotValue + _currentValue)->variableLabel = variableLabel;
   (_dotValue + _currentValue)->dotValue = value;
   (_dotValue + _currentValue)->dotContext = context;
   sprintf((_dotValue + _currentValue)->dotTimestamp, "%s", "NULL");
   char milliseconds[3];
   sprintf(milliseconds, "%s", "000");
-  if (dot_timestamp_millis != NULL) {
-    uint8_t units = dot_timestamp_millis % 10;
-    uint8_t dec = (dot_timestamp_millis / 10) % 10;
-    uint8_t hund = (dot_timestamp_millis / 100) % 10;
+  if (dotTimestampMillis != NULL) {
+    uint8_t units = dotTimestampMillis % 10;
+    uint8_t dec = (dotTimestampMillis / 10) % 10;
+    uint8_t hund = (dotTimestampMillis / 100) % 10;
     sprintf(milliseconds, "%d%d%d", hund, dec, units);
   }
-  if (dot_timestamp_seconds != NULL) {
-    sprintf((_dotValue + _currentValue)->dotTimestamp, "%lu%s", dot_timestamp_seconds, milliseconds);
+  if (dotTimestampSeconds != NULL) {
+    sprintf((_dotValue + _currentValue)->dotTimestamp, "%lu%s", dotTimestampSeconds, milliseconds);
   }
   _currentValue++;
   if (_currentValue > MAX_VALUES) {
@@ -257,15 +257,15 @@ void Ubidots::add(const char* variableLabel, float value, char* context, unsigne
  * Adds to the context structure values to retrieve later it easily by the user
  */
 
-void Ubidots::addContext(char* key_label, char* key_value) {
-  (_context + _current_context)->key_label = key_label;
-  (_context + _current_context)->key_value = key_value;
-  _current_context++;
-  if (_current_context >= MAX_VALUES) {
+void Ubidots::addContext(char* keyLabel, char* keyValue) {
+  (_context + _currentContext)->keyLabel = keyLabel;
+  (_context + _currentContext)->keyValue = keyValue;
+  _currentContext++;
+  if (_currentContext >= MAX_VALUES) {
     Serial.println(
         F("You are adding more than the maximum of consecutive "
           "key-values pairs"));
-    _current_context = MAX_VALUES;
+    _currentContext = MAX_VALUES;
   }
 }
 
@@ -273,16 +273,16 @@ void Ubidots::addContext(char* key_label, char* key_value) {
  * Retrieves the actual stored context properly formatted
  */
 
-void Ubidots::getContext(char* context_result) {
-  sprintf(context_result, "");
-  for (uint8_t i = 0; i < _current_context;) {
-    sprintf(context_result, "%s\"%s\":\"%s\"", context_result, (_context + i)->key_label, (_context + i)->key_value);
+void Ubidots::getContext(char* contextResult) {
+  sprintf(contextResult, "");
+  for (uint8_t i = 0; i < _currentContext;) {
+    sprintf(contextResult, "%s\"%s\":\"%s\"", contextResult, (_context + i)->keyLabel, (_context + i)->keyValue);
     i++;
-    if (i < _current_context) {
-      sprintf(context_result, "%s,", context_result);
+    if (i < _currentContext) {
+      sprintf(contextResult, "%s,", contextResult);
     } else {
-      sprintf(context_result, "%s", context_result);
-      _current_context = 0;
+      sprintf(contextResult, "%s", contextResult);
+      _currentContext = 0;
     }
   }
 }
@@ -291,7 +291,7 @@ void Ubidots::getContext(char* context_result) {
  * Sets the callback to be used to process the data incoming from the subscribed topics
  * @arg callback [Mandatory] Pointer to the callback function that will process the incoming data
  */
-void Ubidots::setCallback(void (*callback)(char*, uint8_t*, unsigned int)) { _client_mqtt_ubi.setCallback(callback); }
+void Ubidots::setCallback(void (*callback)(char*, uint8_t*, unsigned int)) { _clientMqttUbi.setCallback(callback); }
 
 /**
  * Makes available the debug messages
