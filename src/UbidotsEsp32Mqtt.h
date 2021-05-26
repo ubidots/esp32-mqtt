@@ -30,14 +30,14 @@ Created by: Jose Garcia @jotathebest at github: https://github.com/jotathebest
 class Ubidots {
  private:
   // void (*callback)(char*, uint8_t*, unsigned int);
-  WiFiClient _client_tcp_ubi;
-  PubSubClient _client_mqtt_ubi = PubSubClient(_client_tcp_ubi);
+  WiFiClient _clientTcpUbi;
+  PubSubClient _clientMqttUbi = PubSubClient(_clientTcpUbi);
   char* _broker;
   ContextUbi* _context;
   char* _clientName;
   int _brokerPort;
   bool _debug = false;
-  int8_t _current_context = 0;
+  int8_t _currentContext = 0;
   uint8_t _currentValue;
   char* _ssidPassword;
   char* _ssid;
@@ -55,17 +55,17 @@ class Ubidots {
   ~Ubidots();
   void add(const char* variableLabel, float value);
   void add(const char* variableLabel, float value, char* context);
-  void add(const char* variableLabel, float value, char* context, unsigned long dot_timestamp_seconds);
-  void add(const char* variableLabel, float value, char* context, unsigned long dot_timestamp_seconds,
-           unsigned int dot_timestamp_millis);
-  void addContext(char* key_label, char* key_value);
+  void add(const char* variableLabel, float value, char* context, unsigned long dotTimestampSeconds);
+  void add(const char* variableLabel, float value, char* context, unsigned long dotTimestampSeconds,
+           unsigned int dotTimestampMillis);
+  void addContext(char* keyLabel, char* keyValue);
   bool connected();
   bool connect();
   bool connect(const char* username, const char* password);
   bool connect(const char* clientName, const char* username, const char* password);
   void connectToWifi(const char* ssid, const char* pass);
   void disconnect();
-  void getContext(char* context_result);
+  void getContext(char* contextResult);
   bool loop();
   bool publish();
   bool publish(const char* deviceLabel);

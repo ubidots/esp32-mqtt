@@ -51,7 +51,7 @@ Creates an Ubidots instance.
 
 ## Methods
 
-`void add(const char *variable_label, float value, char *context, unsigned long dot_timestamp_seconds, unsigned int dot_timestamp_millis)`
+`void add(const char *variable_label, float value, char *context, unsigned long dotTimestampSeconds, unsigned int dotTimestampMillis)`
 
 Adds a dot with its related value, context and timestamp to be sent to a certain data source.
 
@@ -60,15 +60,15 @@ Adds a dot with its related value, context and timestamp to be sent to a certain
 - @variable_label, [Required]. The label of the variable where the dot will be stored.
 - @value, [Required]. The value of the dot.
 - @context, [Optional]. The dot's context.
-- @dot_timestamp_seconds, [Optional]. The dot's timestamp in seconds.
-- @dot_timestamp_millis, [Optional]. The dot's timestamp number of milliseconds. If the timestamp's milliseconds values is not set, the seconds will be multplied by 1000.
+- @dotTimestampSeconds, [Optional]. The dot's timestamp in seconds.
+- @dotTimestampMillis, [Optional]. The dot's timestamp number of milliseconds. If the timestamp's milliseconds values is not set, the seconds will be multplied by 1000.
 
-`void addContext(char *key_label, char *key_value)`
+`void addContext(char *keyLabel, char *keyValue)`
 
 Adds to local memory a new key-value context key. The method inputs must be char pointers. The method allows to store up to 10 key-value pairs.
 
-- @key_label, [Required]. The key context label to store values.
-- @key_value, [Required]. The key pair value.
+- @keyLabel, [Required]. The key context label to store values.
+- @keyValue, [Required]. The key pair value.
 
 `void getContext(char *context)`
 
