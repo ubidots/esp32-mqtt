@@ -45,6 +45,7 @@ class Ubidots {
   Value* _dotValue;
   void _floatToChar(char* strValue, float value);
   void _builder(const char* token, const char* clientName, const char* broker, const int brokerPort);
+  void _addContext(char* keyLabel, char* keyValue, bool isNumber);
 
  public:
   Ubidots(const char* token);
@@ -59,6 +60,8 @@ class Ubidots {
   void add(const char* variableLabel, float value, char* context, unsigned long dotTimestampSeconds,
            unsigned int dotTimestampMillis);
   void addContext(char* keyLabel, char* keyValue);
+  void addContext(char* keyLabel, float keyValue);
+  void addContext(char* keyLabel, int keyValue);
   bool connected();
   bool connect();
   bool connect(const char* username, const char* password);

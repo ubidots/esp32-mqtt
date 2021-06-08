@@ -256,10 +256,24 @@ void Ubidots::add(const char* variableLabel, float value, char* context, unsigne
 /*
  * Adds to the context structure values to retrieve later it easily by the user
  */
+void Ubidots::addContext(char* keyLabel, char* keyValue) { _addContext(keyLabel, keyValue, false); }
 
-void Ubidots::addContext(char* keyLabel, char* keyValue) {
+void Ubidots::addContext(char* keyLabel, float keyValue) {
+  char strNumber[20];
+  _floatToChar(strNumber, keyValue);
+  _addContext(keyLabel, strNumber, true);
+}
+
+void Ubidots::addContext(char* keyLabel, int keyValue) {
+  char strNumber[20];
+  sprintf(strNumber, "%d", keyValue);
+  _addContext(keyLabel, strNumber, true);
+}
+
+void Ubidots::_addContext(char* keyLabel, char* keyValue, bool isNumber) {
   (_context + _currentContext)->keyLabel = keyLabel;
   (_context + _currentContext)->keyValue = keyValue;
+  (_context + _currentContext)->isNumber = isNumber;
   _currentContext++;
   if (_currentContext >= MAX_VALUES) {
     Serial.println(
@@ -275,15 +289,17 @@ void Ubidots::addContext(char* keyLabel, char* keyValue) {
 
 void Ubidots::getContext(char* contextResult) {
   sprintf(contextResult, "");
-  for (uint8_t i = 0; i < _currentContext;) {
-    sprintf(contextResult, "%s\"%s\":\"%s\"", contextResult, (_context + i)->keyLabel, (_context + i)->keyValue);
-    i++;
-    if (i < _currentContext) {
+  for (uint8_t i = 0; i < _currentContext; i++) {
+    char* format = ((_context + i)->isNumber) ? "%s\"%s\":%s" : "%s\"%s\":\"%s\"";
+    sprintf(contextResult, format, contextResult, (_context + i)->keyLabel, (_context + i)->keyValue);
+    if (i < _currentContext - 1) {
+      Serial.println("Here");
       sprintf(contextResult, "%s,", contextResult);
     } else {
-      sprintf(contextResult, "%s", contextResult);
+      // sprintf(contextResult, "%s", contextResult);
       _currentContext = 0;
     }
+    Serial.println(contextResult);
   }
 }
 

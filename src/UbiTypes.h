@@ -32,6 +32,7 @@ typedef struct Value {
 typedef struct ContextUbi {
   char *keyLabel;
   char *keyValue;
+  bool isNumber;
 } ContextUbi;
 
 #endif
