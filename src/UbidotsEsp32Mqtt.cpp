@@ -256,12 +256,11 @@ void Ubidots::add(const char* variableLabel, float value, char* context, unsigne
 /*
  * Adds to the context structure values to retrieve later it easily by the user
  */
-void Ubidots::addContext(char* keyLabel, char* keyValue) { _addContext(keyLabel, keyValue, false); }
 
 void Ubidots::addContext(char* keyLabel, float keyValue) {
   char strNumber[20];
   _floatToChar(strNumber, keyValue);
-  _addContext(keyLabel, strNumber, true);
+  _addContext(keyLabel, strNumber, false);
 }
 
 void Ubidots::addContext(char* keyLabel, int keyValue) {
@@ -270,10 +269,18 @@ void Ubidots::addContext(char* keyLabel, int keyValue) {
   _addContext(keyLabel, strNumber, true);
 }
 
+void Ubidots::addContext(char* keyLabel, char* keyValue) { _addContext(keyLabel, keyValue, false); }
+
 void Ubidots::_addContext(char* keyLabel, char* keyValue, bool isNumber) {
   (_context + _currentContext)->keyLabel = keyLabel;
-  (_context + _currentContext)->keyValue = keyValue;
-  (_context + _currentContext)->isNumber = isNumber;
+  if (isNumber) {
+    (_context + _currentContext)->keyValue = keyValue;
+  } else {
+    char* strValue = (char*)malloc(sizeof(char) * 100);
+    sprintf(strValue, "\"%s\"", keyValue);
+    (_context + _currentContext)->keyValue = strValue;
+    free(strValue);
+  }
   _currentContext++;
   if (_currentContext >= MAX_VALUES) {
     Serial.println(
@@ -290,8 +297,8 @@ void Ubidots::_addContext(char* keyLabel, char* keyValue, bool isNumber) {
 void Ubidots::getContext(char* contextResult) {
   sprintf(contextResult, "");
   for (uint8_t i = 0; i < _currentContext; i++) {
-    char* format = ((_context + i)->isNumber) ? "%s\"%s\":%s" : "%s\"%s\":\"%s\"";
-    sprintf(contextResult, format, contextResult, (_context + i)->keyLabel, (_context + i)->keyValue);
+    // char* format = ((_context + i)->isNumber) ? "%s\"%s\":%s" : "%s\"%s\":\"%s\"";
+    sprintf(contextResult, "%s: %s", (_context + i)->keyLabel, (_context + i)->keyValue);
     if (i < _currentContext - 1) {
       Serial.println("Here");
       sprintf(contextResult, "%s,", contextResult);
