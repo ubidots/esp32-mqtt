@@ -76,6 +76,7 @@ void Ubidots::setup() {
   Serial.println(_brokerPort);
   Serial.println(_clientName);
   Serial.println(_token);
+  _clientMqttUbi.setBufferSize((uint16_t)MAX_BUFFER_SIZE);
   _clientMqttUbi.setServer(_broker, _brokerPort);
 }
 
