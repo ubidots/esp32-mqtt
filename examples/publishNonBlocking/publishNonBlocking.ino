@@ -82,7 +82,7 @@ void setup()
   ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
   ubidots.setCallback(callback);
   ubidots.setup();
-  ubidots.reconnect();
+  ubidots.connect();
   timer = millis();
 }
 
