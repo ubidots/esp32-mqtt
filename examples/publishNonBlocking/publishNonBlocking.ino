@@ -24,7 +24,6 @@ const char *VARIABLE_LABEL = ""; // Put here your Variable label to which data  
 
 const int PUBLISH_FREQUENCY = 5000; // Update rate in milliseconds
 
-unsigned long timer;
 uint8_t analogPin = 34; // Pin used to read data from GPIO34 ADC_CH6.
 
 Ubidots ubidots(UBIDOTS_TOKEN);
@@ -83,17 +82,17 @@ void setup()
   ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
   ubidots.setCallback(callback);
   ubidots.setup();
-  ubidots.reconnect();
+  ubidots.connect();
   timer = millis();
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
-  if (abs(millis() - timer) > PUBLISH_FREQUENCY)
-  { // triggers the routine every 5 seconds
-    publishToUbidots();
+  if ((millis() - timer) > PUBLISH_FREQUENCY)
+  { // triggers the routine every PUBLISH_FREQUENCY milliseconds
     timer = millis();
+    publishToUbidots();
   }
   if (ubidots.connected())
   {
