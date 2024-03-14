@@ -70,12 +70,14 @@ void Ubidots::_builder(const char* token, const char* clientName, const char* br
 }
 
 void Ubidots::setup() {
-  Serial.print("broker:");
-  Serial.println(_broker);
-  Serial.print("brokerPort:");
-  Serial.println(_brokerPort);
-  Serial.println(_clientName);
-  Serial.println(_token);
+  if (_debug) {
+	Serial.print("broker:");
+	Serial.println(_broker);
+	Serial.print("brokerPort:");
+	Serial.println(_brokerPort);
+	Serial.println(_clientName);
+	Serial.println(_token);
+  }
   _clientMqttUbi.setServer(_broker, _brokerPort);
 }
 
