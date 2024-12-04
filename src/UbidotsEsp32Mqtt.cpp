@@ -70,6 +70,11 @@ void Ubidots::_builder(const char* token, const char* clientName, const char* br
 }
 
 void Ubidots::setup() {
+  if (strcmp(_clientName, "00:00:00:00:00:00") == 0) {
+    String _deviceMac = WiFi.macAddress();
+    strcpy(_clientName, _deviceMac.c_str());
+    Serial.println("Empty client name, using device MAC as client name");
+  } 
   Serial.print("broker:");
   Serial.println(_broker);
   Serial.print("brokerPort:");
