@@ -67,7 +67,7 @@ void loop()
   {
     ubidots.reconnect();
   }
-  if (abs(millis() - timer) > PUBLISH_FREQUENCY) // triggers the routine every 5 seconds
+  if ((millis() - timer) > PUBLISH_FREQUENCY) // triggers the routine every 5 seconds
   {
     float value = analogRead(analogPin);
     ubidots.add(VARIABLE_LABEL, value); // Insert your variable Labels and the value to be sent
